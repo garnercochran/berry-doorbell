@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Berry College Doorbell</title>
+  <title>Dr. Cochran's Doorbell</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -54,7 +54,7 @@
   <button class="berry-button" id="doorbellButton" onclick="sendNotification()" disabled>Doorbell</button>
 
   <footer>
-    Berry College | Office of Marketing and Communications
+    Berry College | Mathematics and Computer Science Department
   </footer>
 
   <script>
@@ -67,7 +67,7 @@
       const name = document.getElementById('nameInput').value.trim();
       if (name === "") return;
 
-      fetch('https://your-app.onrender.com/notify', {
+      fetch('https://berry-doorbell.onrender.com/notify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
