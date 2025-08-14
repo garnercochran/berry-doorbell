@@ -14,7 +14,7 @@ app.post('/notify', async (req, res) => {
     return res.status(400).send("Name is required.");
   }
 
-  const responseLink = 'https://your-app.onrender.com/response';
+  const responseLink = 'https://berry-doorbell.onrender.com/response';
 
   const payload = {
     content: `🔔 ${name} rang the Berry College Doorbell! [Click here to respond](${responseLink})`
