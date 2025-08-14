@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +7,7 @@
     body {
       font-family: 'Arial', sans-serif;
       background-color: #F4F4F4;
-      color: #00205B; /* Berry Blue */
+      color: #00205B;
       text-align: center;
       padding-top: 100px;
     }
@@ -21,21 +20,21 @@
       font-size: 16px;
       width: 250px;
       margin-bottom: 20px;
-      border: 2px solid #00205B;
+      border: 1px solid #ccc;
       border-radius: 5px;
     }
     .berry-button {
-      background-color: #00205B; /* Berry Blue */
+      background-color: #00205B;
       color: white;
       border: none;
       padding: 15px 40px;
       font-size: 18px;
-      border-radius: 8px; /* Rounded corners */
+      border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
     .berry-button:disabled {
-      background-color: #A2AAAD; /* Berry Silver */
+      background-color: #A2AAAD;
       cursor: not-allowed;
     }
     .berry-button:hover:enabled {
@@ -49,8 +48,8 @@
   </style>
 </head>
 <body>
-  <h1>Ring the Berry College Doorbell</h1>
-  <input type="text" id="nameInput" placeholder="Enter your name" oninput="toggleButton()" />
+  <h1>Berry College Doorbell</h1>
+  <input type="text" id="nameInput" placeholder="Enter your name" oninput="checkInput()">
   <br>
   <button class="berry-button" id="doorbellButton" onclick="sendNotification()" disabled>Doorbell</button>
 
@@ -59,7 +58,7 @@
   </footer>
 
   <script>
-    function toggleButton() {
+    function checkInput() {
       const name = document.getElementById('nameInput').value.trim();
       document.getElementById('doorbellButton').disabled = name === "";
     }
@@ -68,8 +67,7 @@
       const name = document.getElementById('nameInput').value.trim();
       if (name === "") return;
 
-      
-      fetch('/notify', {
+      fetch('https://your-app.onrender.com/notify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
