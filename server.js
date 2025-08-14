@@ -55,7 +55,9 @@ app.get('/waiting', (req, res) => {
           fetch('/status?id=${id}')
             .then(response => response.json())
             .then(data => {
-              if (data.status === "on_the_way") {
+              if (data.status === "waiting") {
+                document.getElementById("message").innerText = "Please wait...";
+              } else if (data.status === "on_the_way") {
                 document.getElementById("message").innerText = "I'm on my way!";
               }
             });
