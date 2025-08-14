@@ -30,7 +30,7 @@ app.post('/notify', async (req, res) => {
 });
 
 app.get('/response', (req, res) => {
-  res.send(\`
+  res.send(`
     <!DOCTYPE html>
     <html>
     <head>
@@ -52,7 +52,7 @@ app.get('/response', (req, res) => {
       <h1>I'm on my way!</h1>
     </body>
     </html>
-  \`);
+  `);
 });
 
 const PORT = process.env.PORT || 3000;
