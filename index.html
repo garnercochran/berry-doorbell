@@ -68,6 +68,7 @@
       const name = document.getElementById('nameInput').value.trim();
       if (name === "") return;
 
+      
       fetch('/notify', {
         method: 'POST',
         headers: {
