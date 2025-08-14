@@ -22,14 +22,18 @@ app.post('/notify', async (req, res) => {
 
   const responseLink = `https://berry-doorbell.onrender.com/respond?id=${id}`;
   const payload = {
-    content: `🔔 ${name} rang the Berry College Doorbell! [Click here to respond](${response {
+    content: `🔔 **${name}** rang the Berry College Doorbell!\n👉 [Click here torespond`
+  };
+
+  try {
     await axios.post(process.env.DISCORD_WEBHOOK_URL, payload);
     res.json({ id });
   } catch (error) {
-    console.error("Error sending webhook:", error);
+    console.error("Error sending webhook:", error.response?.data || error.message);
     res.status(500).send("Error sending notification.");
   }
 });
+
 
 // Respond endpoint: updates status when link is clicked
 app.get('/respond', (req, res) => {
@@ -64,6 +68,8 @@ app.post('/confirm', express.urlencoded({ extended: true }), (req, res) => {
     res.status(404).send("Session not found.");
   }
 });
+
+
 
 
 // Waiting page: polls status and updates message
