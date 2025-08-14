@@ -24,6 +24,13 @@ app.post('/notify', async (req, res) => {
   const payload = {
     content: `🔔 ${name} rang the Berry College Doorbell! [Click here to respond](${responseLink})`
   };
+  try {
+    await axios.post(process.env.DISCORD_WEBHOOK_URL, payload);
+    res.json({ id });
+  } catch (error) {
+    console.error("Error sending webhook:", error.response?.data || error.message);
+    res.status(500).send("Error sending notification.");
+  }
 });
 
 
