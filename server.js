@@ -10,6 +10,7 @@ app.use(express.json());
 
 const sessions = {};
 
+// Notify endpoint: creates a session and sends a Discord webhook
 app.post('/notify', async (req, res) => {
   const { name } = req.body;
   if (!name || name.trim() === "") {
@@ -21,10 +22,7 @@ app.post('/notify', async (req, res) => {
 
   const responseLink = `https://berry-doorbell.onrender.com/respond?id=${id}`;
   const payload = {
-    content: `🔔 ${name} rang the Berry College Doorbell! [Click here to respond](${responseLink})`
-  };
-
-  try {
+    content: `🔔 ${name} rang the Berry College Doorbell! [Click here to respond](${response {
     await axios.post(process.env.DISCORD_WEBHOOK_URL, payload);
     res.json({ id });
   } catch (error) {
@@ -33,8 +31,32 @@ app.post('/notify', async (req, res) => {
   }
 });
 
+// Respond endpoint: updates status when link is clicked
 app.get('/respond', (req, res) => {
   const { id } = req.query;
+  if (!sessions[id]) {
+    return res.status(404).send("Session not found.");
+  }
+
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Confirm Response</title>
+    </head>
+    <body>
+      <h1>Respond to ${sessions[id].name}?</h1>
+      <form action="/confirm" method="POST">
+        <input type="hidden" name="id" value="${id}" />
+        <button type="submit">I'm on my way!</button>
+      </form>
+    </body>
+    </html>
+  `);
+});
+
+app.post('/confirm', express.urlencoded({ extended: true }), (req, res) => {
+  const { id } = req.body;
   if (sessions[id]) {
     sessions[id].status = "on_the_way";
     res.send("<h1>Response recorded. Student will be notified.</h1>");
@@ -43,6 +65,8 @@ app.get('/respond', (req, res) => {
   }
 });
 
+
+// Waiting page: polls status and updates message
 app.get('/waiting', (req, res) => {
   const { id } = req.query;
   res.send(`
@@ -55,9 +79,7 @@ app.get('/waiting', (req, res) => {
           fetch('/status?id=${id}')
             .then(response => response.json())
             .then(data => {
-              if (data.status === "waiting") {
-                document.getElementById("message").innerText = "Please wait...";
-              } else if (data.status === "on_the_way") {
+              if (data.status === "on_the_way") {
                 document.getElementById("message").innerText = "I'm on my way!";
               }
             });
@@ -72,6 +94,7 @@ app.get('/waiting', (req, res) => {
   `);
 });
 
+// Status endpoint: returns current status
 app.get('/status', (req, res) => {
   const { id } = req.query;
   if (sessions[id]) {
