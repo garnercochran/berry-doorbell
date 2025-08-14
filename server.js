@@ -20,7 +20,7 @@ app.post('/notify', async (req, res) => {
   const id = uuidv4();
   sessions[id] = { name, status: "waiting" };
 
-  const responseLink = `https://https://berry-doorbell.onrender.com/respond?id=${id}`;
+  const responseLink = `https://berry-doorbell.onrender.com/respond?id=${id}`;
   const payload = {
     content: `🔔 ${name} rang the Berry College Doorbell! [Click here to respond](${responseLink})`
   };
