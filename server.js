@@ -1,20 +1,19 @@
 require('dotenv').config();
 const express = require('express');
-const axios = require('axios');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
+const axios = require('axios');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 const sessions = {};
 
 app.post('/notify', async (req, res) => {
   const { name } = req.body;
   if (!name || name.trim() === "") {
-    return res.status(400).json({ error: "Name is required." });
+    return res.status(400).send("Name is required.");
   }
 
   const id = uuidv4();
@@ -26,18 +25,18 @@ app.post('/notify', async (req, res) => {
   };
 
   try {
-    await axios.post(WEBHOOK_URL, payload);
+    await axios.post(process.env.DISCORD_WEBHOOK_URL, payload);
     res.json({ id });
   } catch (error) {
     console.error("Error sending webhook:", error);
-    res.status(500).json({ error: "Error sending notification." });
+    res.status(500).send("Error sending notification.");
   }
 });
 
 app.get('/respond', (req, res) => {
-  const id = req.query.id;
+  const { id } = req.query;
   if (sessions[id]) {
-    sessions[id].status = "on the way";
+    sessions[id].status = "on_the_way";
     res.send("<h1>Response recorded. Student will be notified.</h1>");
   } else {
     res.status(404).send("Session not found.");
@@ -45,11 +44,7 @@ app.get('/respond', (req, res) => {
 });
 
 app.get('/waiting', (req, res) => {
-  const id = req.query.id;
-  if (!sessions[id]) {
-    return res.status(404).send("Session not found.");
-  }
-
+  const { id } = req.query;
   res.send(`
     <!DOCTYPE html>
     <html>
@@ -60,7 +55,7 @@ app.get('/waiting', (req, res) => {
           fetch('/status?id=${id}')
             .then(response => response.json())
             .then(data => {
-              if (data.status === "on the way") {
+              if (data.status === "on_the_way") {
                 document.getElementById("message").innerText = "I'm on my way!";
               }
             });
@@ -69,18 +64,18 @@ app.get('/waiting', (req, res) => {
       </script>
     </head>
     <body>
-      <h1 id="message">The doorbell has been rung. Please wait...</h1>
+      <h1 id="message">Your doorbell has been rung. Please wait...</h1>
     </body>
     </html>
   `);
 });
 
 app.get('/status', (req, res) => {
-  const id = req.query.id;
+  const { id } = req.query;
   if (sessions[id]) {
     res.json({ status: sessions[id].status });
   } else {
-    res.status(404).json({ error: "Session not found." });
+    res.status(404).send("Session not found.");
   }
 });
 

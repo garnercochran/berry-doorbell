@@ -2,48 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dr. Cochran's Doorbell</title>
+  <title>Berry College Doorbell</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
       background-color: #F4F4F4;
       color: #00205B;
       text-align: center;
       padding-top: 100px;
     }
-    h1 {
-      font-size: 2em;
-      margin-bottom: 20px;
-    }
-    input[type="text"] {
+    input, button {
       padding: 10px;
       font-size: 16px;
-      width: 250px;
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      margin: 10px;
     }
-    .berry-button {
+    button {
       background-color: #00205B;
       color: white;
       border: none;
-      padding: 15px 40px;
-      font-size: 18px;
       border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
     }
-    .berry-button:disabled {
-      background-color: #A2AAAD;
+    button:disabled {
+      background-color: #ccc;
       cursor: not-allowed;
-    }
-    .berry-button:hover:enabled {
-      background-color: #005A9C;
-    }
-    footer {
-      margin-top: 50px;
-      font-size: 0.9em;
-      color: #A2AAAD;
     }
   </style>
 </head>
@@ -51,11 +33,7 @@
   <h1>Berry College Doorbell</h1>
   <input type="text" id="nameInput" placeholder="Enter your name" oninput="checkInput()">
   <br>
-  <button class="berry-button" id="doorbellButton" onclick="sendNotification()" disabled>Doorbell</button>
-
-  <footer>
-    Berry College | Mathematics and Computer Science Department
-  </footer>
+  <button id="doorbellButton" onclick="ringDoorbell()" disabled>Doorbell</button>
 
   <script>
     function checkInput() {
@@ -63,10 +41,8 @@
       document.getElementById('doorbellButton').disabled = name === "";
     }
 
-    function sendNotification() {
+    function ringDoorbell() {
       const name = document.getElementById('nameInput').value.trim();
-      if (name === "") return;
-
       fetch('https://berry-doorbell.onrender.com/notify', {
         method: 'POST',
         headers: {
@@ -74,11 +50,12 @@
         },
         body: JSON.stringify({ name: name })
       })
-      .then(response => {
-        if (response.ok) {
-          alert("Notification sent!");
+      .then(response => response.json())
+      .then(data => {
+        if (data.id) {
+          window.location.href = `https://berry-doorbell.onrender.com/waiting?id=${data.id}`;
         } else {
-          alert("Failed to send notification.");
+          alert("Failed to ring doorbell.");
         }
       })
       .catch(error => {
