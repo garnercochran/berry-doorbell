@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Respond to Visitor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 80px;
+    }
+    button, textarea {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    textarea {
+      width: 300px;
+      height: 100px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Respond to Visitor</h1>
+  <p>Select a response to send to the waiting visitor:</p>
+
+  <button onclick="sendResponse('I\'m on the way!')">I'm on the way!</button>
+  <br />
+  <button onclick="sendResponse('I\'m unavailable, please send me an email to schedule a meeting.')">
+    I'm unavailable, please send me an email to schedule a meeting.
+  </button>
+  <br />
+  <textarea id="customMessage" placeholder="Enter a custom message..."></textarea>
+  <br />
+  <button onclick="sendCustomMessage()">Send Custom Message</button>
+
+  <script>
+    async function sendResponse(message) {
+      const res = await fetch('/respond', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message })
+      });
+
+      if (res.ok) {
+        alert("Response sent!");
+      } else {
+        alert("Failed to send response.");
+      }
+    }
+
+    function sendCustomMessage() {
+      const message = document.getElementById('customMessage').value;
+      if (!message.trim()) {
+        alert("Please enter a custom message.");
+        return;
+      }
+      sendResponse(message);
+    }
+  </script>
+</body>
+</html>

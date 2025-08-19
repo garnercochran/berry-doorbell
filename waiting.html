@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Waiting Room</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+    #response {
+      margin-top: 30px;
+      font-size: 1.5em;
+      color: #2c3e50;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dr. Cochran has been notified!</h1>
+  <p>Please wait here for a response.</p>
+  <div id="response"></div>
+
+  <script>
+    async function checkStatus() {
+      const res = await fetch('/status');
+      const data = await res.json();
+      if (data.message) {
+        document.getElementById('response').innerText = data.message;
+        clearInterval(polling);
+      }
+    }
+
+    const polling = setInterval(checkStatus, 3000); // Check every 3 seconds
+  </script>
+</body>
+</html>

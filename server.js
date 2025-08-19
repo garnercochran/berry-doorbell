@@ -1,71 +1,73 @@
-require('dotenv').config();
 const express = require('express');
-const { v4: uuidv4 } = require('uuid');
-const axios = require('axios');
+const bodyParser = require('body-parser');
+const path = require('path');
+const fetch = require('node-fetch');
+require('dotenv').config();
+
 const app = express();
-
-const cors = require('cors');
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-const sessions = {};
-const timeouts = {};
-
-app.post('/notify', async (req, res) => {
-    const { name } = req.body;
-    if (!name || name.trim() === "") {
-        return res.status(400).send("Name is required.");
-    }
-
-    const id = uuidv4();
-    sessions[id] = { name, status: "Dr. Cochran has been notified!" };
-
-  const responseLink = `https://berry-doorbell.onrender.com/respond?id=${id}`;
-  const payload = {
-    content: `🔔 ${name} rang the Berry College Doorbell! [Click here to respond](${responseLink})`
-  };
-
-    try {
-        await axios.post(process.env.DISCORD_WEBHOOK_URL, payload);
-        // Set fallback timeout
-        timeouts[id] = setTimeout(() => {
-            if (sessions[id].status === "Dr. Cochran has been notified!") {
-                sessions[id].status = "I'm unavailable, please send me an email to schedule a meeting.";
-            }
-        }, 60000);
-        res.redirect(`/waiting?id=${id}`);
-    } catch (error) {
-        console.error("Error sending webhook:", error.response?.data || error.message);
-        res.status(500).send("Error sending notification.");
-    }
-});
-
-app.get('/response', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Response</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          background-color: #F4F4F4;
-          color: #00205B;
-          text-align: center;
-          padding-top: 100px;
-        }
-        h1 {
-          font-size: 2em;
-        }
-      </style>
-    </head>
-    <body>
-      <h1>I'm on my way!</h1>
-    </body>
-    </html>
-  `);
-});
-
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+app.use(bodyParser.json());
+app.use(express.static('public'));
+
+let currentVisitor = null;
+let responseMessage = null;
+let timeoutHandle = null;
+
+// Serve.join(__dirname, 'public/index.html'));
+
+// Serve waiting page
+app.get('/waiting', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/waiting.html'));
+});
+
+// Serve response page
+app.get('/respond', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/respond.html'));
+});
+
+// Handle doorbell ring
+app.post('/ring', async (req, res) => {
+  const { name } = req.body;
+  currentVisitor = { name, timestamp: Date.now() };
+  responseMessage = null;
+
+  // Send Discord notification
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  const responseLink = `https://berry-doorbell.onrender.com/respond`;
+
+  await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      content: `🔔 ${name} rang the doorbell!\nRespond here: ${responseLink}`
+    })
+  });
+
+  // Start 1-minute timeout
+  if (timeoutHandle) clearTimeout(timeoutHandle);
+  timeoutHandle = setTimeout(() => {
+    if (!responseMessage) {
+      responseMessage = "I'm unavailable, please send me an email to schedule a meeting.";
+    }
+  }, 60000);
+
+  res.status(200).send({ message: 'Doorbell rung!' });
+});
+
+// Handle response from User 2
+app.post('/respond', (req, res) => {
+  const { message } = req.body;
+  responseMessage = message;
+  if (timeoutHandle) clearTimeout(timeoutHandle);
+  res.status(200).send({ message: 'Response recorded.' });
+});
+
+// Polling endpoint for waiting page
+app.get('/status', (req, res) => {
+  res.send({ message: responseMessage });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
