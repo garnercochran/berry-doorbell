@@ -1,68 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Berry College Doorbell</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #F4F4F4;
-      color: #00205B;
-      text-align: center;
-      padding-top: 100px;
-    }
-    input, button {
-      padding: 10px;
-      font-size: 16px;
-      margin: 10px;
-    }
-    button {
-      background-color: #00205B;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-  </style>
+    <title>Office Doorbell</title>
 </head>
 <body>
-  <h1>Berry College Doorbell</h1>
-  <input type="text" id="nameInput" placeholder="Enter your name" oninput="checkInput()">
-  <br>
-  <button id="doorbellButton" onclick="ringDoorbell()" disabled>Doorbell</button>
-
-  <script>
-    function checkInput() {
-      const name = document.getElementById('nameInput').value.trim();
-      document.getElementById('doorbellButton').disabled = name === "";
-    }
-
-    function ringDoorbell() {
-      const name = document.getElementById('nameInput').value.trim();
-      fetch('https://berry-doorbell.onrender.com/notify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name: name })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.id) {
-          window.location.href = `https://berry-doorbell.onrender.com/waiting?id=${data.id}`;
-        } else {
-          alert("Failed to ring doorbell.");
-        }
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        alert("Error sending notification.");
-      });
-    }
-  </script>
+    <h1>Welcome to Dr. Cochran's Office</h1>
+    <form action="/notify" method="POST">
+        <label for="name">Enter your name:</label>
+        <input type="text" id="name" name="name" required>
+        <button type="submit">Ring Doorbell</button>
+    </form>
 </body>
 </html>
