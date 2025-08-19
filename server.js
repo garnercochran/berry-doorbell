@@ -3,6 +3,8 @@ const express = require('express');
 const axios = require('axios');
 const app = express();
 
+const cors = require('cors');
+app.use(cors());
 app.use(express.json());
 
 const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
