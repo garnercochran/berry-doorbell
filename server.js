@@ -18,12 +18,12 @@ let timeoutHandle = null;
 
 // Serve waiting page
 app.get('/waiting', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/waiting.html'));
+  res.sendFile(path.join(__dirname, 'waiting.html'));
 });
 
 // Serve response page
 app.get('/respond', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/respond.html'));
+  res.sendFile(path.join(__dirname, 'respond.html'));
 });
 
 // Handle doorbell ring
