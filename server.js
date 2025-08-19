@@ -22,16 +22,10 @@ app.post('/notify', async (req, res) => {
     const id = uuidv4();
     sessions[id] = { name, status: "Dr. Cochran has been notified!" };
 
-<<<<<<< HEAD
-    const responseLink = `https://berry-doorbell.onrender.com/respond?id=${id}`;
-    const payload = {
-        content: "🔔 ${name} rang the Berry College Doorbell!\n[Click here to respond]"    };
-=======
   const responseLink = `https://https://berry-doorbell.onrender.com/respond?id=${id}`;
   const payload = {
     content: `🔔 ${name} rang the Berry College Doorbell! [Click here to respond](${responseLink})`
   };
->>>>>>> parent of 9f7a3a0 (Update server.js)
 
     try {
         await axios.post(process.env.DISCORD_WEBHOOK_URL, payload);
