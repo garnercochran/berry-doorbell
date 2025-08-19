@@ -1,14 +1,92 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Office Doorbell</title>
+  <meta charset="UTF-8">
+  <title>Berry College Doorbell</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #F4F4F4;
+      color: #00205B; /* Berry Blue */
+      text-align: center;
+      padding-top: 100px;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 250px;
+      margin-bottom: 20px;
+      border: 2px solid #00205B;
+      border-radius: 5px;
+    }
+    .berry-button {
+      background-color: #00205B; /* Berry Blue */
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 18px;
+      border-radius: 8px; /* Rounded corners */
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .berry-button:disabled {
+      background-color: #A2AAAD; /* Berry Silver */
+      cursor: not-allowed;
+    }
+    .berry-button:hover:enabled {
+      background-color: #005A9C;
+    }
+    footer {
+      margin-top: 50px;
+      font-size: 0.9em;
+      color: #A2AAAD;
+    }
+  </style>
 </head>
 <body>
-    <h1>Welcome to Dr. Cochran's Office</h1>
-    <form action="/notify" method="POST">
-        <label for="name">Enter your name:</label>
-        <input type="text" id="name" name="name" required>
-        <button type="submit">Ring Doorbell</button>
-    </form>
+  <h1>Ring the Berry College Doorbell</h1>
+  <input type="text" id="nameInput" placeholder="Enter your name" oninput="toggleButton()" />
+  <br>
+  <button class="berry-button" id="doorbellButton" onclick="sendNotification()" disabled>Doorbell</button>
+
+  <footer>
+    Berry College | Math and CS Department
+  </footer>
+
+  <script>
+    function toggleButton() {
+      const name = document.getElementById('nameInput').value.trim();
+      document.getElementById('doorbellButton').disabled = name === "";
+    }
+
+    function sendNotification() {
+      const name = document.getElementById('nameInput').value.trim();
+      if (name === "") return;
+
+      fetch('/notify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: name })
+      })
+      .then(response => {
+        if (response.ok) {
+          alert("Notification sent!");
+        } else {
+          alert("Failed to send notification.");
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("Error sending notification.");
+      });
+    }
+  </script>
 </body>
 </html>
