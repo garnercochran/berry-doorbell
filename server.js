@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const axios = require('axios');
 const app = express();
 
+const cors = require('cors');
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -40,58 +41,30 @@ app.post('/notify', async (req, res) => {
     }
 });
 
-app.get('/respond', (req, res) => {
-    const { id } = req.query;
-    if (!sessions[id]) {
-        return res.status(404).send("Session not found.");
-    }
-
-    res.send(`
-        <html>
-        <body>
-            <h1>Respond to ${sessions[id].name}</h1>
-            <form action="/confirm" method="POST">
-                <input type="hidden" name="id" value="${id}" />
-                <button name="response" value="I'm on the way!">I'm on the way!</button><br><br>
-                <button name="response" value="I'm unavailable, please send me an email to schedule a meeting.">I'm unavailable</button><br><br>
-                <input type="text" name="custom" placeholder="Custom message" />
-                <button type="submit">Send Custom Message</button>
-            </form>
-        </body>
-        </html>
-    `);
-});
-
-app.post('/confirm', (req, res) => {
-    const { id, response, custom } = req.body;
-    if (!sessions[id]) {
-        return res.status(404).send("Session not found.");
-    }
-
-    const finalMessage = custom?.trim() || response || "I'm unavailable, please send me an email to schedule a meeting.";
-    sessions[id].status = finalMessage;
-
-    if (timeouts[id]) {
-        clearTimeout(timeouts[id]);
-        delete timeouts[id];
-    }
-
-    res.send(`<h2>Response recorded: ${finalMessage}</h2>`);
-});
-
-app.get('/waiting', (req, res) => {
-    const { id } = req.query;
-    const message = sessions[id]?.status || "Waiting...";
-    res.send(`<h2>${message}</h2>`);
-});
-
-app.get('/status', (req, res) => {
-    const { id } = req.query;
-    if (sessions[id]) {
-        res.json({ status: sessions[id].status });
-    } else {
-        res.status(404).send("Session not found.");
-    }
+app.get('/response', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Response</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #F4F4F4;
+          color: #00205B;
+          text-align: center;
+          padding-top: 100px;
+        }
+        h1 {
+          font-size: 2em;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>I'm on my way!</h1>
+    </body>
+    </html>
+  `);
 });
 
 const PORT = process.env.PORT || 3000;
