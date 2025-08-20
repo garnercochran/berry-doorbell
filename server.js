@@ -1,73 +1,62 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const path = require('path');
-const fetch = require('node-fetch');
 require('dotenv').config();
-
+const express = require('express');
+const axios = require('axios');
 const app = express();
-const PORT = process.env.PORT || 10000;
 
-app.use(bodyParser.json());
-app.use(express.static('public'));
+const cors = require('cors');
+app.use(cors());
 
-let currentVisitor = null;
-let responseMessage = null;
-let timeoutHandle = null;
+app.use(express.json());
 
-// Serve.join(__dirname, 'public/index.html'));
+const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
-// Serve waiting page
-app.get('/waiting', (req, res) => {
-  res.sendFile(path.join(__dirname, 'waiting.html'));
-});
-
-// Serve response page
-app.get('/respond', (req, res) => {
-  res.sendFile(path.join(__dirname, 'respond.html'));
-});
-
-// Handle doorbell ring
-app.post('/ring', async (req, res) => {
+app.post('/notify', async (req, res) => {
   const { name } = req.body;
-  currentVisitor = { name, timestamp: Date.now() };
-  responseMessage = null;
 
-  // Send Discord notification
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-  const responseLink = `https://berry-doorbell.onrender.com/respond`;
+  if (!name || name.trim() === "") {
+    return res.status(400).send("Name is required.");
+  }
 
-  await fetch(webhookUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      content: `🔔 ${name} rang the doorbell!\nRespond here: ${responseLink}`
-    })
-  });
+  const responseLink = 'https://berry-doorbell.onrender.com/response';
 
-  // Start 1-minute timeout
-  if (timeoutHandle) clearTimeout(timeoutHandle);
-  timeoutHandle = setTimeout(() => {
-    if (!responseMessage) {
-      responseMessage = "I'm unavailable, please send me an email to schedule a meeting.";
-    }
-  }, 60000);
+  const payload = {
+    content: `🔔 ${name} rang the Berry College Doorbell! [Click here to respond](${responseLink})`
+  };
 
-  res.status(200).send({ message: 'Doorbell rung!' });
+  try {
+    await axios.post(WEBHOOK_URL, payload);
+    res.status(200).send("Notification sent.");
+  } catch (error) {
+    console.error("Error sending webhook:", error);
+    res.status(500).send("Error sending notification.");
+  }
 });
 
-// Handle response from User 2
-app.post('/respond', (req, res) => {
-  const { message } = req.body;
-  responseMessage = message;
-  if (timeoutHandle) clearTimeout(timeoutHandle);
-  res.status(200).send({ message: 'Response recorded.' });
+app.get('/response', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Response</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #F4F4F4;
+          color: #00205B;
+          text-align: center;
+          padding-top: 100px;
+        }
+        h1 {
+          font-size: 2em;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>I'm on my way!</h1>
+    </body>
+    </html>
+  `);
 });
 
-// Polling endpoint for waiting page
-app.get('/status', (req, res) => {
-  res.send({ message: responseMessage });
-});
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

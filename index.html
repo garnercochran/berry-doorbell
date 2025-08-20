@@ -1,50 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Virtual Doorbell</title>
+  <meta charset="UTF-8">
+  <title>Dr. Cochran's Doorbell</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
+      background-color: #F4F4F4;
+      color: #00205B;
       text-align: center;
       padding-top: 100px;
     }
-    input, button {
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
       padding: 10px;
       font-size: 16px;
-      margin: 10px;
+      width: 250px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .berry-button {
+      background-color: #00205B;
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .berry-button:disabled {
+      background-color: #A2AAAD;
+      cursor: not-allowed;
+    }
+    .berry-button:hover:enabled {
+      background-color: #005A9C;
+    }
+    footer {
+      margin-top: 50px;
+      font-size: 0.9em;
+      color: #A2AAAD;
     }
   </style>
 </head>
 <body>
-  <h1>Welcome to Dr. Cochran's Office</h1>
-  <p>Please enter your name and ring the doorbell.</p>
-  <input type="text" id="nameInput" placeholder="Your name" />
-  <br />
-  <button onclick="ringDoorbell()">Ring Doorbell</button>
+  <h1>Berry College Doorbell</h1>
+  <input type="text" id="nameInput" placeholder="Enter your name" oninput="checkInput()">
+  <br>
+  <button class="berry-button" id="doorbellButton" onclick="sendNotification()" disabled>Doorbell</button>
+
+  <footer>
+    Berry College | Mathematics and Computer Science Department
+  </footer>
 
   <script>
-    async function ringDoorbell() {
-      const name = document.getElementById('nameInput').value;
-      if (!name) {
-        alert("Please enter your name.");
-        return;
-      }
+    function checkInput() {
+      const name = document.getElementById('nameInput').value.trim();
+      document.getElementById('doorbellButton').disabled = name === "";
+    }
 
-      const response = await fetch('/ring', {
+    function sendNotification() {
+      const name = document.getElementById('nameInput').value.trim();
+      if (name === "") return;
+
+      fetch('https://berry-doorbell.onrender.com/notify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name })
+        body: JSON.stringify({ name: name })
+      })
+      .then(response => {
+        if (response.ok) {
+          alert("Notification sent!");
+        } else {
+          alert("Failed to send notification.");
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("Error sending notification.");
       });
-
-      if (response.ok) {
-        window.location.href = '/waiting';
-      } else {
-        alert("Something went wrong. Please try again.");
-      }
     }
   </script>
 </body>

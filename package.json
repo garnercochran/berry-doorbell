@@ -1,21 +1,15 @@
+
 {
-  "name": "virtual-doorbell",
+  "name": "berry-doorbell-backend",
   "version": "1.0.0",
-  "description": "A virtual doorbell system for Dr. Cochran using Node.js, HTML, and Discord notifications.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "body-parser": "^1.20.2",
+    "axios": "^1.6.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "node-fetch": "^2.6.7"
-  },
-  "engines": {
-    "node": ">=14.0.0"
-  },
-  "keywords": [],
-  "author": "Dr. Cochran",
-  "license": "Berry College"
+    "cors": "^2.8.5"
+  }
 }
