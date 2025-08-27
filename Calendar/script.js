@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
     Friday: ['11:00', '11:30', '15:00', '15:30', '16:00']
   };
 
+
   const officeHours = {
     Monday: ['13:00', '13:30', '14:00'],
     Wednesday: ['13:00', '13:30', '14:00'],
