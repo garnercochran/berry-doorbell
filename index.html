@@ -52,6 +52,7 @@
   <input type="text" id="nameInput" placeholder="Enter your name" oninput="checkInput()">
   <br>
   <button class="berry-button" id="doorbellButton" onclick="sendNotification()" disabled>Doorbell</button>
+  <div id="statusMessage" style="margin-top:20px; color:#005A9C; font-size:1.1em;"></div>
 
   <footer>
     Berry College | Mathematics and Computer Science Department
@@ -67,6 +68,9 @@
       const name = document.getElementById('nameInput').value.trim();
       if (name === "") return;
 
+      // Show waiting message immediately
+      document.getElementById('statusMessage').innerText = "Please wait on this page for a confirmation. It can take 30 seconds for the doorbell to ring.";
+
       fetch('https://berry-doorbell.onrender.com/notify', {
         method: 'POST',
         headers: {
@@ -76,14 +80,14 @@
       })
       .then(response => {
         if (response.ok) {
-          alert("Notification sent!");
+          document.getElementById('statusMessage').innerText = "Notification sent!";
         } else {
-          alert("Failed to send notification.");
+          document.getElementById('statusMessage').innerText = "Failed to send notification.";
         }
       })
       .catch(error => {
         console.error("Error:", error);
-        alert("Error sending notification.");
+        document.getElementById('statusMessage').innerText = "Error sending notification.";
       });
     }
   </script>
