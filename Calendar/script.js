@@ -71,7 +71,36 @@ function toggleSelection(cell) {
 }
 
 function handleOfficeHourClick() {
-  alert("For any time colored blue, these are open office hours. You can drop by my office to see if I am available during these times, or click this link to immediately book a meeting during this time:\n\nhttps://outlook.office.com/book/DrGarnerCochran@berry.edu/");
+  // Create modal if it doesn't exist
+  if (!document.getElementById('officeHourModal')) {
+    const modal = document.createElement('div');
+    modal.id = 'officeHourModal';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.background = 'rgba(0,0,0,0.5)';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.zIndex = '1000';
+
+    modal.innerHTML = `
+      <div style="background:#fff;padding:30px 40px;border-radius:10px;max-width:400px;text-align:center;position:relative;">
+        <p>
+          For any time colored blue, these are open office hours. You can drop by my office to see if I am available during these times,<br><br>
+          or <a href="https://outlook.office.com/book/DrGarnerCochran@berry.edu/" target="_blank" style="color:#005A9C;text-decoration:underline;">click this link to immediately book a meeting during this time</a>.
+        </p>
+        <button id="closeOfficeHourModal" style="margin-top:20px;padding:8px 20px;border:none;background:#00205B;color:#fff;border-radius:5px;cursor:pointer;">Close</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('closeOfficeHourModal').onclick = function() {
+      modal.remove();
+    };
+  }
 }
 
 function getTimeInterval(startTime) {
@@ -115,7 +144,7 @@ function sendAvailability() {
     availability += `${day} from ${interval.start} to ${interval.end}\n`;
   });
 
-  const email = 'your-email@example.com';
+  const email = 'gcochran@berry.edu';
   const subject = 'Availability for Next Week';
   const body = encodeURIComponent(availability);
   window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
