@@ -67,6 +67,11 @@ button:hover {
   color: white;
 }
 
+.maybe-available.selected {
+  background-color: #FFA300; /* Accent Orange */
+  color: white;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   th, td {
