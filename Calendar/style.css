@@ -62,6 +62,11 @@ button:hover {
   background-color: #0085CA;
 }
 
+.maybe-available {
+  background-color: #3CB371; /* MediumSeaGreen */
+  color: white;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   th, td {

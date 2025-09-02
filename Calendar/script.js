@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function () {
     Friday: ['11:00', '11:30', '15:00', '15:30', '16:00']
   };
 
-
   const officeHours = {
     Monday: ['13:00', '13:30', '14:00'],
     Wednesday: ['13:00', '13:30', '14:00'],
@@ -35,7 +34,8 @@ document.addEventListener('DOMContentLoaded', function () {
       } else if (isOfficeHour) {
         row += `<td class="office-hours" onclick="handleOfficeHourClick()"></td>`;
       } else {
-        row += `<td onclick="toggleSelection(this)"></td>`;
+        // Color all other slots green and make them selectable
+        row += `<td class="maybe-available" onclick="toggleSelection(this)"></td>`;
       }
     });
     row += '</tr>';
